@@ -59,7 +59,12 @@ jobs:
       - name: Build wheels
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_BEFORE_ALL_LINUX: yum install -y alsa-lib libxcb
+          CIBW_BEFORE_ALL_LINUX: >
+            if command -v yum >/dev/null 2>&1; then
+              yum install -y alsa-lib libxcb;
+            else
+              apt-get update && apt-get install -y libasound2 libxcb1;
+            fi
           CIBW_BEFORE_BUILD: python scripts/fetch-vendor.py --config-file scripts/ffmpeg-7.0.json /tmp/vendor
           CIBW_BEFORE_BUILD_MACOS: python scripts/fetch-vendor.py --config-file scripts/ffmpeg-7.0.json /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: python scripts\fetch-vendor.py --config-file scripts\ffmpeg-7.0.json C:\cibw\vendor
